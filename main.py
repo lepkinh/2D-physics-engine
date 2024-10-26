@@ -21,6 +21,10 @@ GRAY = (128, 128, 128)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+BLANCHEDALMOND = (255, 235, 205)
+PUMPKIN = (255, 177, 52)
+LATTE = (255, 195, 158)
+ALIENGOO = (102, 255, 102)
 
 class Circle:
     def __init__(self, pos, radius, color):
@@ -182,7 +186,7 @@ class PhysicsEngine:
             self.handle_collisions()
             
             # draw
-            self.screen.fill(WHITE)
+            self.screen.fill(BLANCHEDALMOND)
             
             # draw UI
             self.radius_slider.draw(self.screen)
