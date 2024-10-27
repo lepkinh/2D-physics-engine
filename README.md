@@ -4,6 +4,7 @@ A simple 2D physics simulator built with Pygame where you can spawn and interact
 
 ## Features
 - Click to spawn circles with customizable properties
+- Click existing circles to apply a pushing force
 - Real-time physics simulation including gravity and collisions
 - Adjustable circle size using slider
 - Color selection (Red, Green, Blue)
@@ -29,7 +30,8 @@ python main.py
 2. Controls:
 - Use the slider at the top to adjust circle size (5-50 pixels)
 - Click the colored buttons to change circle color
-- Click anywhere in the main window to spawn circles
+- Click in empty space to spawn new circles
+- Click existing circles to push them away from the click point
 - Circles will automatically fall, bounce, and interact with each other
 
 ## Physics Parameters
@@ -37,3 +39,4 @@ You can modify these constants in the code to adjust the simulation:
 - `GRAVITY`: Controls fall speed
 - `ELASTICITY`: Controls bounce strength (0-1)
 - `FRICTION`: Controls speed decay (0-1)
+- `PUSH_FORCE`: Controls the strength of pushing force when clicking circles

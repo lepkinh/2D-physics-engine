@@ -13,6 +13,7 @@ FPS = 60
 GRAVITY = Vector2(0, 981.0)  # pixels/s/s
 ELASTICITY = 0.7
 FRICTION = 0.99
+PUSH_FORCE = 2500000.0
 
 # colors
 BLACK = (0, 0, 0)
@@ -46,6 +47,14 @@ class Circle:
 
     def draw(self, screen):
         pygame.draw.circle(screen, self.color, (int(self.pos.x), int(self.pos.y)), self.radius)
+
+    def contains_point(self, point):
+        return (Vector2(point) - self.pos).length() <= self.radius
+
+    def apply_force(self, force):
+        # F = ma
+        acceleration = force / self.mass
+        self.velocity += acceleration
 
 class Button:
     def __init__(self, x, y, width, height, text, color):
@@ -150,6 +159,21 @@ class PhysicsEngine:
                     circle1.pos += normal * overlap
                     circle2.pos -= normal * overlap
 
+
+    def handle_circle_click(self, mouse_pos):
+        # check circles in reverse order (top to bottom)
+        for circle in reversed(self.circles):
+            if circle.contains_point(mouse_pos):
+                # direction from click to circle center
+                click_to_center = circle.pos - Vector2(mouse_pos)
+                if click_to_center.length() > 0:
+                    # normalizing and applying force in direction opposite to click
+                    force_direction = click_to_center.normalize()
+                    force = force_direction * PUSH_FORCE
+                    circle.apply_force(force)
+                return True  # true if we hit a circle
+        return False
+
     def run(self):
         running = True
         while running:
@@ -162,17 +186,20 @@ class PhysicsEngine:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     # checking UI interaction
-                    if mouse_pos[1] > 80:  # below UI area
-                        new_circle = Circle(
-                            mouse_pos,
-                            self.radius_slider.value,
-                            self.current_color
-                        )
-                        self.circles.append(new_circle)
-                    else:
+                    if mouse_pos[1] <= 80:
                         for button in self.color_buttons:
                             if button.is_clicked(mouse_pos):
                                 self.current_color = button.color
+                    else:
+                        # try push existing circles first
+                        if not self.handle_circle_click(mouse_pos):
+                            # spawn new circle if no new is hit
+                            new_circle = Circle(
+                                mouse_pos,
+                                self.radius_slider.value,
+                                self.current_color
+                            )
+                            self.circles.append(new_circle)
                                 
                 self.radius_slider.handle_event(event)
                 
@@ -208,7 +235,7 @@ class PhysicsEngine:
                     self.current_color,
                     mouse_pos,
                     int(self.radius_slider.value),
-                    1  # draw outline only
+                    1  # drawing outline only
                 )
             
             pygame.display.flip()
